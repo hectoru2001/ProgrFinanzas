@@ -18,18 +18,10 @@ while True:
         bddGast = open("dGast.txt", "w")
         dGast = input("Ingresa la cantidad que se haya gastado $")
         bddGast.write(dGast)
-        bddGast.close()
         input("")
-    elif opcion == "2":
-        bddCant = open("dCant.txt", "r")
-        bddGast = open("dGast.txt", "r")
-        dGast = bddGast.read()
-        dCant = bddCant.read()
-        num1 = int(dGast)
-        num2 = int(dCant)
-        print("Esta es la cantidad de dinero con la que cuentas actualmente $" + str(num2 - num1))
-        bddCant.close()
         bddGast.close()
+    elif opcion == "2":
+        input("")
     elif opcion == "3":
         bddCant = open("dCant.txt", "w")
         dCant = input("Ingresa la cantidad que deseas cambiar $")
