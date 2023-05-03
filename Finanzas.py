@@ -1,4 +1,5 @@
 import os, mysql.connector, datetime
+from prettytable import PrettyTable  
 
 # Conexión con la base de datos
 conexion = mysql.connector.connect(host="localhost", user="root", passwd="", database="user")
@@ -26,7 +27,7 @@ while True:
     print("3. Registrar un nuevo ingreso de dinero")
     print("4. Cambiar la cantidad del total por una nueva")
     print("5. Mostrar los últimos gastos realizados")
-    print("6. Mostrar los últimos ingresos realizados")
+    print("6. Mostrar los últimos ingresos recibidos")
     print("7. Eliminar historial")
 
 
@@ -71,16 +72,19 @@ while True:
         print("Estos son los ultimos gastos que se han hecho")
         ejecucion.execute("SELECT gasto, motGasto, feGasto FROM ingresos WHERE gasto > 0 ORDER BY id")
         gasInf = ejecucion.fetchall()
-        for x in gasInf:
-            print(f"Gasto: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
+        tablaG = PrettyTable(['Gasto', 'Motivo de gasto', 'Fecha de gasto'])
+        for prGas in gasInf:
+            tablaG.add_row(prGas)
+        print(tablaG)
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "6":
-        print("Estos son los ultimos ingresos que se han hecho")
+        print("Estos son los ultimos ingresos que se han recibido")
         ejecucion.execute("SELECT ingreso, motIngreso, feIngreso FROM ingresos WHERE ingreso > 0 ORDER BY id")
         gasInf = ejecucion.fetchall()
-        for x in gasInf:
-            print(f"Ingreso: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
-                
+        tablaI = PrettyTable(['Ingreso', 'Motivo de ingreso', 'Fecha de ingreso'])
+        for prIng in gasInf:
+            tablaI.add_row(prIng)
+        print(tablaI) 
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "7":
          print("¿Estás seguro de que deseas borrar todo el historial? si / no")
@@ -91,3 +95,11 @@ while True:
              input("Historial eliminado con éxito, pulse cualquier tecla para continuar")
          elif sel == "no":
              pass
+    elif opcion == "69":
+        ejecucion.execute("SELECT id, gasto, motGasto, feGasto, ingreso, motIngreso, feIngreso, total FROM ingresos")
+        bdd = ejecucion.fetchall()
+        tabla = PrettyTable(['ID', 'Gastos', 'Motivo de gasto', 'Fecha de gasto', 'Ingreso', 'Motivo de ingreso', 'Fecha de ingreso', 'Total'])
+        for muestra in bdd:
+            tabla.add_row(muestra)
+        print(tabla)
+        input("")
