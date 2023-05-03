@@ -13,10 +13,10 @@ while True:
     ejecucion.execute("SELECT total FROM ingresos ORDER BY id DESC LIMIT 1")
     resultado = ejecucion.fetchone()
     if resultado == None:
-        print("Error al encontrar información en la base de datos")
+        print("* No existe historial de gastos, ingrese nueva información *")
         total = 0
     else:
-        total = int(resultado[0])
+        total = float(resultado[0])
     
     print("----- Bienvenido al programa de finanzas -----")
     print("")
@@ -39,9 +39,9 @@ while True:
         print("Esta es la cantidad actual con la que cuentas de dinero: " + str(total))
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "2":
-        print("Escribe la cantidad que hayas gastado")
-        gasto = int(input())
-        print("Ingresa el motivo del gasto")
+        print("Escribe la cantidad que hayas gastado:")
+        gasto = float(input("$ "))
+        print("Ingresa el motivo del gasto:")
         motGasto = input()
         total = total - gasto
         print("Muy bien, con el gasto registrado ahora tu cantidad de dinero es de: " + str(total))
@@ -50,9 +50,9 @@ while True:
         conexion.commit()
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "3":
-        print("Escribe la cantidad que hayas ingresado")
-        ingreso = int(input())
-        print("Ingresa el motivo del ingreso")
+        print("Escribe la cantidad que hayas ingresado:")
+        ingreso = float(input("$ "))
+        print("Ingresa el motivo del ingreso:")
         motIngreso = input()
         total = total + ingreso
         print("Muy bien, con el ingreso registrado ahora tu cantidad de dinero es de: " + str(total))
@@ -61,30 +61,33 @@ while True:
         conexion.commit()
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "4":
-        print("Ingresa la nueva cantidad de dinero que tienes")
-        total = int(input())
+        print("Ingresa la nueva cantidad de dinero que tienes:")
+        total = float(input("$ "))
         ejecucion.execute(f"INSERT INTO ingresos (total) VALUES ({total})" )
         conexion.commit()
         print("Muy bien, ahora la nueva cantidad que tienes de dinero es de: " + str(total))
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "5":
         print("Estos son los ultimos gastos que se han hecho")
-        ejecucion.execute("SELECT gasto, motGasto, feGasto FROM ingresos ORDER BY id")
+        ejecucion.execute("SELECT gasto, motGasto, feGasto FROM ingresos WHERE gasto > 0 ORDER BY id")
         gasInf = ejecucion.fetchall()
         for x in gasInf:
             print(f"Gasto: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "6":
         print("Estos son los ultimos ingresos que se han hecho")
-        ejecucion.execute("SELECT ingreso, motIngreso, feIngreso FROM ingresos ORDER BY id")
+        ejecucion.execute("SELECT ingreso, motIngreso, feIngreso FROM ingresos WHERE ingreso > 0 ORDER BY id")
         gasInf = ejecucion.fetchall()
         for x in gasInf:
             print(f"Ingreso: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
+                
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "7":
          print("¿Estás seguro de que deseas borrar todo el historial? si / no")
          sel = input()
          if sel == "si":
-             pass
+             ejecucion.execute("DELETE FROM ingresos")
+             conexion.commit()
+             input("Historial eliminado con éxito, pulse cualquier tecla para continuar")
          elif sel == "no":
              pass
