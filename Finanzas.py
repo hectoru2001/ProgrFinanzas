@@ -1,88 +1,93 @@
-import os
-import mysql.connector
-os.system("cls")
+import os, mysql.connector, datetime
 
-conexion1 = mysql.connector.connect(host="localhost", user="root", passwd="", database="user")
-eject = conexion1.cursor()
+# Conexión con la base de datos
+conexion = mysql.connector.connect(host="localhost", user="root", passwd="", database="user")
+ejecucion = conexion.cursor()
 
-# Obtener el saldo anterior desde el archivo
-with open("saldo.txt", "r") as archivo:
-    saldo = archivo.read()
-    saldo_anterior = int(saldo)
 
 while True:
-    print("Menú de opciones:")
-    print("1. Ingresar gasto")
-    print("2. Mostrar dinero actual")
-    print("3. Ingresar nueva cantidad de dinero")
-    print("4. Ingresar un nuevo déposito")
-    print("5. Salir del programa")
-    print("6. Mostrar ultimos gastos hechos")
+    # Limpiar consola
+    os.system("cls")
 
+    # Extraer el total de la base de datos
+    ejecucion.execute("SELECT total FROM ingresos ORDER BY id DESC LIMIT 1")
+    resultado = ejecucion.fetchone()
+    if resultado == None:
+        print("* No existe historial de gastos, ingrese nueva información *")
+        total = 0
+    else:
+        total = float(resultado[0])
     
-    opcion = input("Ingrese una opción: ")
+    print("----- Bienvenido al programa de finanzas -----")
+    print("")
+    print("- Por favor elige la transacción que desees realizar -")
+    print("1. Mostrar mi cantidad actual de dinero")
+    print("2. Registrar un nuevo gasto de dinero")
+    print("3. Registrar un nuevo ingreso de dinero")
+    print("4. Cambiar la cantidad del total por una nueva")
+    print("5. Mostrar los últimos gastos realizados")
+    print("6. Mostrar los últimos ingresos realizados")
+    print("7. Eliminar historial")
+
+
+
+
+    print()
+    opcion = input()
     
     if opcion == "1":
-        
-        # Escribir valor total en archivo de texto
-        gas = int(input("Ingrese un Gasto: "))
-        mot = input('Ingrese el motivo del gasto: ')
-        with open("saldo.txt", "w") as archivo:
-            archivo.write(str(saldo_actual - gas))
-
-        # Secuencia para guardar valor en base de datos
-        values = (gas, mot)
-        sql = "INSERT INTO ingresos (gasto, motivo) VALUES (%s, %s)"
-        eject.execute(sql, values)
-        conexion1.commit()
-        print("El saldo actual es:", saldo_actual - gas)
-        print(eject.rowcount, input("Valor insertado correctamente, pulsa cualquier tecla para continuar "))
-        os.system("cls")
-        
-        
+        print("Esta es la cantidad actual con la que cuentas de dinero: " + str(total))
+        input("Pulsa cualquier tecla para continuar")
     elif opcion == "2":
-        os.system("cls")
-        with open("saldo.txt", "r") as archivo:
-            archivo.read(saldo)
-        print("Esta es la cantidad de dinero con la que cuentas actualmente: ", saldo)
+        print("Escribe la cantidad que hayas gastado:")
+        gasto = float(input("$ "))
+        print("Ingresa el motivo del gasto:")
+        motGasto = input()
+        total = total - gasto
+        print("Muy bien, con el gasto registrado ahora tu cantidad de dinero es de: " + str(total))
+        feGasto = datetime.date.today()
+        ejecucion.execute(f"INSERT INTO ingresos (gasto, motGasto, feGasto, total) VALUES (%s, %s, %s, %s)", (gasto, motGasto, feGasto, total))
+        conexion.commit()
         input("Pulsa cualquier tecla para continuar")
-        os.system("cls")
-        
-        
     elif opcion == "3":
-        os.system("cls")
-        nCant = int(input("Ingrese la nueva cantidad de dinero "))
-        saldo_actual = nCant
-        with open("saldo.txt", "w") as archivo:
-            archivo.write(str(saldo_actual))
-        print("Esta es la cantidad de dinero con la que cuentas actualmente: " + str(saldo_actual))
+        print("Escribe la cantidad que hayas ingresado:")
+        ingreso = float(input("$ "))
+        print("Ingresa el motivo del ingreso:")
+        motIngreso = input()
+        total = total + ingreso
+        print("Muy bien, con el ingreso registrado ahora tu cantidad de dinero es de: " + str(total))
+        feIngreso = datetime.date.today()
+        ejecucion.execute("INSERT INTO ingresos (ingreso, motIngreso, feIngreso, total) VALUES (%s, %s, %s, %s)", (ingreso, motIngreso, feIngreso, total))
+        conexion.commit()
         input("Pulsa cualquier tecla para continuar")
-        os.system("cls")
-        
-        
     elif opcion == "4":
-        ing = int(input("Ingrese un cantidad de dinero: "))
-        mot = input('Ingrese el motivo del gasto: ')
-        sql = "INSERT INTO ingresos (ingreso, motivo) VALUES (%s, %s)"
-        values = (ing, mot)
-        eject.execute(sql, values)
-        conexion1.commit()
-        print(eject.rowcount, "record inserted.")
-        
-        
-    elif opcion == "5":
-        eject.execute("SELECT gasto, motivo FROM ingresos")
-        resultados = eject.fetchall()
-        os.system("cls")
-        for fila in resultados:
-            print(fila)
+        print("Ingresa la nueva cantidad de dinero que tienes:")
+        total = float(input("$ "))
+        ejecucion.execute(f"INSERT INTO ingresos (total) VALUES ({total})" )
+        conexion.commit()
+        print("Muy bien, ahora la nueva cantidad que tienes de dinero es de: " + str(total))
         input("Pulsa cualquier tecla para continuar")
-
+    elif opcion == "5":
+        print("Estos son los ultimos gastos que se han hecho")
+        ejecucion.execute("SELECT gasto, motGasto, feGasto FROM ingresos WHERE gasto > 0 ORDER BY id")
+        gasInf = ejecucion.fetchall()
+        for x in gasInf:
+            print(f"Gasto: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
+        input("Pulsa cualquier tecla para continuar")
     elif opcion == "6":
-        os.system("cls")
-        print("Nos vemos pronto")
-        break  
-            
-    else:
-        print("Opción inválida. Por favor, seleccione una opción válida.")
-        input("Presiona enter para continuar")
+        print("Estos son los ultimos ingresos que se han hecho")
+        ejecucion.execute("SELECT ingreso, motIngreso, feIngreso FROM ingresos WHERE ingreso > 0 ORDER BY id")
+        gasInf = ejecucion.fetchall()
+        for x in gasInf:
+            print(f"Ingreso: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
+                
+        input("Pulsa cualquier tecla para continuar")
+    elif opcion == "7":
+         print("¿Estás seguro de que deseas borrar todo el historial? si / no")
+         sel = input()
+         if sel == "si":
+             ejecucion.execute("DELETE FROM ingresos")
+             conexion.commit()
+             input("Historial eliminado con éxito, pulse cualquier tecla para continuar")
+         elif sel == "no":
+             pass
