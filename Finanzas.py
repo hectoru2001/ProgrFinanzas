@@ -78,13 +78,11 @@ while True:
         print(tablaG)
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "6":
-        print("Estos son los ultimos ingresos que se han recibido")
-        ejecucion.execute("SELECT ingreso, motIngreso, feIngreso FROM ingresos WHERE ingreso > 0 ORDER BY id")
+        print("Estos son los ultimos ingresos que se han hecho")
+        ejecucion.execute("SELECT ingreso, motIngreso, feIngreso FROM ingresos ORDER BY id")
         gasInf = ejecucion.fetchall()
-        tablaI = PrettyTable(['Ingreso', 'Motivo de ingreso', 'Fecha de ingreso'])
-        for prIng in gasInf:
-            tablaI.add_row(prIng)
-        print(tablaI) 
+        for x in gasInf:
+            print(f"Ingreso: $ {x[0]} | Motivo: {x[1]} | Fecha: {x[2]}")
         input("Pulsa cualquier tecla para continuar")
     elif opcion == "7":
          print("¿Estás seguro de que deseas borrar todo el historial? si / no")
