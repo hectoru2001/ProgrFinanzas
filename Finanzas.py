@@ -103,3 +103,24 @@ while True:
             tabla.add_row(muestra)
         print(tabla)
         input("")
+    elif opcion == "deudas":
+        print("- Bienvenido al modo de deudas -")
+        print("Ingresa por favor la descripción de la deuda")
+        descDeuda = input("")
+        print("Ingresa el monto de la deuda")
+        montDeuda = float(input(""))
+        dateActual = datetime.date.today()
+        ejecucion.execute("INSERT INTO deudas (descripcion, monto, fecha) VALUES (%s, %s, %s)", (descDeuda, montDeuda, dateActual))
+        print("¿Deseas ver el listado de deudas?")
+        ele = input()
+        if ele == "si":
+            print("Estas son las deudas por el momento")
+            ejecucion.execute("SELECT descripcion, monto, fecha FROM deudas")
+            deuInf = ejecucion.fetchall()
+            tablaII = PrettyTable(['Descripción de deuda', 'Monto de deuda', 'Fecha de pago'])
+            for prDeu in deuInf:
+                tablaII.add_row(prDeu)
+            print(tablaII) 
+            input("Pulsa cualquier tecla para continuar")
+        elif ele == "no":
+            pass
